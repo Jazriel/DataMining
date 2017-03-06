@@ -1,0 +1,80 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.rules.JRip -F 3 -N 2.0 -O 2 -S 1
+Relation:     data1
+Instances:    24000
+Attributes:   29
+              A1
+              A2
+              A3
+              A4
+              A5
+              A6
+              A7
+              A8
+              A9
+              A10
+              A11
+              A12
+              A13
+              A14
+              A15
+              A16
+              A17
+              A18
+              A19
+              A20
+              A21
+              A22
+              A23
+              A24
+              A25
+              A26
+              A27
+              A28
+              class
+Test mode:    user supplied test set:  size unknown (reading incrementally)
+
+=== Classifier model (full training set) ===
+
+JRIP rules:
+===========
+
+(A6 >= 0.4) => class=Positive (2508.0/786.0)
+(A6 >= 0.3) and (A7 >= 0.4) and (A10 >= 0.4) => class=Positive (499.0/225.0)
+(A18 <= 0.001374) and (A6 >= 0.3) and (A24 <= 0.111113) and (A8 >= 0.4) => class=Positive (169.0/83.0)
+ => class=Negative (20824.0/3224.0)
+
+Number of Rules : 4
+
+
+Time taken to build model: 2.56 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.01 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        1639               81.95   %
+Incorrectly Classified Instances       361               18.05   %
+Kappa statistic                          0.4039
+Mean absolute error                      0.2868
+Root mean squared error                  0.3798
+Relative absolute error                 81.6364 %
+Root relative squared error             89.727  %
+Total Number of Instances             2000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.950    0.608    0.837      0.950    0.890      0.430    0.674     0.835     Negative
+                 0.392    0.050    0.704      0.392    0.503      0.430    0.674     0.445     Positive
+Weighted Avg.    0.820    0.478    0.806      0.820    0.800      0.430    0.674     0.744     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 1456   77 |    a = Negative
+  284  183 |    b = Positive
+

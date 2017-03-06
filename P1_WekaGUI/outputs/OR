@@ -1,0 +1,77 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.rules.OneR -B 6
+Relation:     data1
+Instances:    24000
+Attributes:   29
+              A1
+              A2
+              A3
+              A4
+              A5
+              A6
+              A7
+              A8
+              A9
+              A10
+              A11
+              A12
+              A13
+              A14
+              A15
+              A16
+              A17
+              A18
+              A19
+              A20
+              A21
+              A22
+              A23
+              A24
+              A25
+              A26
+              A27
+              A28
+              class
+Test mode:    user supplied test set:  size unknown (reading incrementally)
+
+=== Classifier model (full training set) ===
+
+A6:
+	< 0.35	-> Negative
+	< 0.6499999999999999	-> Positive
+	< 0.8500000000000001	-> Negative
+	>= 0.8500000000000001	-> Positive
+(19633/24000 instances correct)
+
+
+Time taken to build model: 0.2 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.02 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        1647               82.35   %
+Incorrectly Classified Instances       353               17.65   %
+Kappa statistic                          0.388 
+Mean absolute error                      0.1765
+Root mean squared error                  0.4201
+Relative absolute error                 50.2348 %
+Root relative squared error             99.2628 %
+Total Number of Instances             2000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.970    0.657    0.829      0.970    0.894      0.435    0.656     0.827     Negative
+                 0.343    0.030    0.777      0.343    0.475      0.435    0.656     0.420     Positive
+Weighted Avg.    0.824    0.511    0.817      0.824    0.796      0.435    0.656     0.732     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 1487   46 |    a = Negative
+  307  160 |    b = Positive
+

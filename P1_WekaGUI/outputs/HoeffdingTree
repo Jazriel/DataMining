@@ -1,0 +1,97 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.trees.HoeffdingTree -L 2 -S 1 -E 1.0E-7 -H 0.05 -M 0.01 -G 200.0 -N 0.0
+Relation:     data1
+Instances:    24000
+Attributes:   29
+              A1
+              A2
+              A3
+              A4
+              A5
+              A6
+              A7
+              A8
+              A9
+              A10
+              A11
+              A12
+              A13
+              A14
+              A15
+              A16
+              A17
+              A18
+              A19
+              A20
+              A21
+              A22
+              A23
+              A24
+              A25
+              A26
+              A27
+              A28
+              class
+Test mode:    user supplied test set:  size unknown (reading incrementally)
+
+=== Classifier model (full training set) ===
+
+
+A6 <= 0,364: 
+|   A18 <= 0,021: 
+|   |   A15 <= 0,131: Negative (323,740) NB1 NB adaptive1
+|   |   A15 > 0,131: 
+|   |   |   A22 <= 0,071: 
+|   |   |   |   A17 <= 0,258: Negative (603,808) NB2 NB adaptive2
+|   |   |   |   A17 > 0,258: 
+|   |   |   |   |   A23 <= 0,044: 
+|   |   |   |   |   |   A7 <= 0,318: 
+|   |   |   |   |   |   |   A20 <= 0,013: 
+|   |   |   |   |   |   |   |   A7 <= 0,218: 
+|   |   |   |   |   |   |   |   |   A23 <= 0,008: Negative (1442,690) NB3 NB adaptive3
+|   |   |   |   |   |   |   |   |   A23 > 0,008: Negative (419,310) NB4 NB adaptive4
+|   |   |   |   |   |   |   |   A7 > 0,218: Negative (497,044) NB5 NB adaptive5
+|   |   |   |   |   |   |   A20 > 0,013: Negative (417,500) NB6 NB adaptive6
+|   |   |   |   |   |   A7 > 0,318: Negative (480,818) NB7 NB adaptive7
+|   |   |   |   |   A23 > 0,044: Negative (255,569) NB8 NB adaptive8
+|   |   |   A22 > 0,071: Negative (245,001) NB9 NB adaptive9
+|   A18 > 0,021: Negative (1014,000) NB10 NB adaptive10
+A6 > 0,364: 
+|   A7 <= 0,173: Negative (69,500) NB11 NB adaptive11
+|   A7 > 0,173: 
+|   |   A17 <= 0,187: Negative (28,500) NB12 NB adaptive12
+|   |   A17 > 0,187: 
+|   |   |   A4 <= 0,061: Negative (32,000) NB13 NB adaptive13
+|   |   |   A4 > 0,061: Positive (1166,000) NB14 NB adaptive14
+
+Time taken to build model: 2.41 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.24 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        1655               82.75   %
+Incorrectly Classified Instances       345               17.25   %
+Kappa statistic                          0.3985
+Mean absolute error                      0.2778
+Root mean squared error                  0.3739
+Relative absolute error                 79.0784 %
+Root relative squared error             88.3325 %
+Total Number of Instances             2000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,975    0,655    0,830      0,975    0,896      0,450    0,721     0,856     Negative
+                 0,345    0,025    0,805      0,345    0,483      0,450    0,721     0,503     Positive
+Weighted Avg.    0,828    0,508    0,824      0,828    0,800      0,450    0,721     0,773     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 1494   39 |    a = Negative
+  306  161 |    b = Positive
+

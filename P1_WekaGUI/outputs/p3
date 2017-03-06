@@ -1,0 +1,112 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.meta.FilteredClassifier -F "weka.filters.MultiFilter -F \"weka.filters.supervised.instance.SMOTE -C 0 -K 5 -P 150.0 -S 1\"" -W weka.classifiers.meta.Bagging -- -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.meta.RotationForest -- -G 3 -H 3 -P 50 -F "weka.filters.unsupervised.attribute.PrincipalComponents -R 1.0 -A 5 -M -1" -S 1 -num-slots 1 -I 10 -W weka.classifiers.meta.ClassificationViaRegression -- -W weka.classifiers.trees.M5P -- -M 4.0
+Relation:     data1
+Instances:    24000
+Attributes:   29
+              A1
+              A2
+              A3
+              A4
+              A5
+              A6
+              A7
+              A8
+              A9
+              A10
+              A11
+              A12
+              A13
+              A14
+              A15
+              A16
+              A17
+              A18
+              A19
+              A20
+              A21
+              A22
+              A23
+              A24
+              A25
+              A26
+              A27
+              A28
+              class
+Test mode:    user supplied test set:  size unknown (reading incrementally)
+
+=== Classifier model (full training set) ===
+
+FilteredClassifier using weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.meta.RotationForest -- -G 3 -H 3 -P 50 -F "weka.filters.unsupervised.attribute.PrincipalComponents -R 1.0 -A 5 -M -1" -S 1 -num-slots 1 -I 10 -W weka.classifiers.meta.ClassificationViaRegression -- -W weka.classifiers.trees.M5P -- -M 4.0 on data filtered through weka.filters.MultiFilter -F "weka.filters.supervised.instance.SMOTE -C 0 -K 5 -P 150.0 -S 1"
+
+Filtered Header
+@relation 'data1-weka.filters.supervised.instance.SMOTE-C0-K5-P150.0-S1-weka.filters.MultiFilter-Fweka.filters.supervised.instance.SMOTE -C 0 -K 5 -P 150.0 -S 1'
+
+@attribute A1 numeric
+@attribute A2 numeric
+@attribute A3 numeric
+@attribute A4 numeric
+@attribute A5 numeric
+@attribute A6 numeric
+@attribute A7 numeric
+@attribute A8 numeric
+@attribute A9 numeric
+@attribute A10 numeric
+@attribute A11 numeric
+@attribute A12 numeric
+@attribute A13 numeric
+@attribute A14 numeric
+@attribute A15 numeric
+@attribute A16 numeric
+@attribute A17 numeric
+@attribute A18 numeric
+@attribute A19 numeric
+@attribute A20 numeric
+@attribute A21 numeric
+@attribute A22 numeric
+@attribute A23 numeric
+@attribute A24 numeric
+@attribute A25 numeric
+@attribute A26 numeric
+@attribute A27 numeric
+@attribute A28 numeric
+@attribute class {Negative,Positive}
+
+@data
+
+
+Classifier Model
+Bagging with 10 iterations and base learner
+
+weka.classifiers.meta.RotationForest -G 3 -H 3 -P 50 -F "weka.filters.unsupervised.attribute.PrincipalComponents -R 1.0 -A 5 -M -1" -S 1 -num-slots 1 -I 10 -W weka.classifiers.meta.ClassificationViaRegression -- -W weka.classifiers.trees.M5P -- -M 4.0
+
+Time taken to build model: 1195.57 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 5.36 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        1618               80.9    %
+Incorrectly Classified Instances       382               19.1    %
+Kappa statistic                          0.4131
+Mean absolute error                      0.3143
+Root mean squared error                  0.3777
+Relative absolute error                 89.4549 %
+Root relative squared error             89.2386 %
+Total Number of Instances             2000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.915    0.540    0.848      0.915    0.880      0.421    0.787     0.912     Negative
+                 0.460    0.085    0.623      0.460    0.530      0.421    0.787     0.603     Positive
+Weighted Avg.    0.809    0.433    0.795      0.809    0.798      0.421    0.787     0.840     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 1403  130 |    a = Negative
+  252  215 |    b = Positive
+

@@ -1,0 +1,71 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.rules.ZeroR 
+Relation:     data1
+Instances:    24000
+Attributes:   29
+              A1
+              A2
+              A3
+              A4
+              A5
+              A6
+              A7
+              A8
+              A9
+              A10
+              A11
+              A12
+              A13
+              A14
+              A15
+              A16
+              A17
+              A18
+              A19
+              A20
+              A21
+              A22
+              A23
+              A24
+              A25
+              A26
+              A27
+              A28
+              class
+Test mode:    user supplied test set:  size unknown (reading incrementally)
+
+=== Classifier model (full training set) ===
+
+ZeroR predicts class value: Negative
+
+Time taken to build model: 0.02 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.06 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        1533               76.65   %
+Incorrectly Classified Instances       467               23.35   %
+Kappa statistic                          0     
+Mean absolute error                      0.3513
+Root mean squared error                  0.4232
+Relative absolute error                100      %
+Root relative squared error            100      %
+Total Number of Instances             2000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    1.000    0.767      1.000    0.868      0.000    0.500     0.767     Negative
+                 0.000    0.000    0.000      0.000    0.000      0.000    0.500     0.234     Positive
+Weighted Avg.    0.767    0.767    0.588      0.767    0.665      0.000    0.500     0.642     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 1533    0 |    a = Negative
+  467    0 |    b = Positive
+
