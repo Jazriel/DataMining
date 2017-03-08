@@ -67,6 +67,15 @@ public class DataMiningFacade {
 	 */
 	public void loadDataset(String path){
 		
+		DataSource source;
+		 		try {
+		 			source = new DataSource(path);
+		 			dataset = source.getDataSet();
+		 		} catch (Exception e) {
+		 			// TODO Auto-generated catch block
+		 			e.printStackTrace();
+		 		}
+		
 	}
 	
 	/**
@@ -75,6 +84,13 @@ public class DataMiningFacade {
 	 * @param path arff absolute path
 	 */
 	public void loadClassifier(String path){
+		
+		try {
+			 			classifier = (Classifier) weka.core.SerializationHelper.read(path);
+			 		} catch (Exception e) {
+			 			// TODO Auto-generated catch block
+			 			e.printStackTrace();
+			 		}
 		
 	}
 	
@@ -85,6 +101,13 @@ public class DataMiningFacade {
 	 */
 	public void loadClusterer(String path){
 		
+		try {
+			 			clusterer = (Clusterer) weka.core.SerializationHelper.read(path);
+			 		} catch (Exception e) {
+			 			// TODO Auto-generated catch block
+			 			e.printStackTrace();
+			 		}
+		
 	}
 	
 	/**
@@ -92,6 +115,12 @@ public class DataMiningFacade {
 	 */
 	public void saveClassifier(){
 		
+		try {
+			 			weka.core.SerializationHelper.write("~/DataMining/P2_WekaProgramming/classifier.model", classifier);
+			 		} catch (Exception e) {
+			 			// TODO Auto-generated catch block
+			 			e.printStackTrace();
+			 		} // ruta
 	}
 	
 	/**
@@ -99,6 +128,12 @@ public class DataMiningFacade {
 	 */
 	public void saveClusterer(){
 		
+		try {
+			 			weka.core.SerializationHelper.write("~/DataMining/P2_WekaProgramming/clusterer.model", clusterer);
+			 		} catch (Exception e) {
+			 			// TODO Auto-generated catch block
+			 			e.printStackTrace();
+			 		} // ruta
 	}
 	
 	/**
