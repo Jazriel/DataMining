@@ -99,18 +99,14 @@ REPTree
 Genera diferentes particiones, cada partición lo considera como una hoja, prediciendo la clase mayoritaria de esa hoja. También funciona en regresión, devuelve la media de cada hoja.
 Usando su método de clasificación dio unos resultados mediocres. Aparte también probamos usandolo para regresión gracias a classification via regresión lo cual dio mejores resultados aunque no una maravilla.
 Hoeffding Tree
-Es un clasificador que construye un árbol en el cual está sujeto a cambios, si se insertan nuevas instancias el árbol irá cambiado. Dentro de los clasificadores basados en árboles es de los que mejor resultado nos ha dado.
+Es un clasificador que construye un árbol en el cual está sujeto a cambios, si se insertan nuevas instancias el árbol irá cambiado. Dentro de los clasificadores basados en árboles es de los que mejor resultado nos ha dado. Se puede ver que en parte estamos usando una búsqueda algo aleatoria ya que no hemos encontrado un método significativamente mejor que los demás. 
 Random Forest
-Este método no es un árbol simple si no un ensemble de árboles en los que no se elige el mejor atributo de cada nodo, sino, el mejor de un subconjunto aleatorio de atributos.
-Los resultados son parecidos a los otros clasificadores basados en árboles 
-
-
-
-
+Este método no es un árbol simple si no un ensemble de árboles en los que no se elige el mejor atributo de cada nodo, sino, el mejor de un subconjunto aleatorio de atributos, supusimos que si algunos atributos estaban manchando el conjunto de datos un random forest podría quitar estos por pura estadística.
+Los resultados son parecidos a los otros clasificadores basados en árboles. Al final no ha dado los resultados esperados aunque pensamos que quizá sea una buena idea
 Rotation Forest
 Por curiosidad se probó rotation forest (no es un método de los básicos de weka) y se vio que daba unos resultados muy buenos para lo conseguido hasta el momento.
-El método consiste en dados unas features(para que no haya una varianza extrema) se rota sobre el resto de features con otros clasificadores para conseguir una mezcla de capacidad individual bastante buena con diversidad lo cual es fundamental en un ensemble.
-Dió los mejores resultados por un estrecho margen. 
+El método consiste en dados unas features de base (para que no haya una varianza extrema) se rota sobre el resto de features con otros clasificadores para conseguir una mezcla de capacidad individual bastante buena con diversidad lo cual es fundamental en un ensemble.
+Dió los mejores resultados por un estrecho margen de manera que los intentamos amplificar mediante el uso de ensembles. 
 Resultados básicos
   
 
@@ -119,7 +115,7 @@ Tras probar varios filtros un tanto al azar se vio que para solucionar el proble
 
 
 Fine tuning
-Una vez tenemos el clasificador mejor de los que hemos encontrado con el mejor filtro hemos decidido intentar mejorar sus resultados con modificaciones de los atributos por defecto. Para bajar la cantidad de varianza del modelo se ha decidido envolverlo con bagging ya que simplemente cambiando la seed de números aleatorios (sin probar demasiadas) había más de un 1% de varianza en los resultados. Se espera reducir este margen. 
+Una vez tenemos el clasificador mejor de los que hemos encontrado con el mejor filtro hemos decidido intentar mejorar sus resultados con modificaciones de los atributos por defecto. Para bajar la cantidad de varianza del modelo se ha decidido envolverlo con bagging ya que simplemente cambiando la seed de números aleatorios (sin probar demasiadas) había más de un 1% de varianza en los resultados. Se espera reducir este margen. No se ha podido amplificar su f-measure pero se espera haber conseguido estabilizarlo algo más.
 Prueba 1
 
 
@@ -153,7 +149,6 @@ weka.classifiers.meta.FilteredClassifier -F "weka.filters.MultiFilter -F \"weka.
 Resultados Fine tuning
   
 
-________________
 Datos
 
 
@@ -205,7 +200,10 @@ Pruebas
 
 ________________
 Conclusiones
-Tras bastantes intentos y trabajo no se ha conseguido aumentar el porcentaje de aciertos de forma significativa sobre un clasificador tan simple como OneR lo cual es algo decepcionante por lo que nos planteamos que los datos estaban algo ofuscados como para no encontrar una solución sin poder automatizar las pruebas. 
+Tras bastantes intentos y trabajo no se ha conseguido aumentar el porcentaje de aciertos de forma significativa sobre un clasificador tan simple como OneR lo cual es algo decepcionante por lo que nos planteamos que los datos estaban algo ofuscados como para no encontrar una solución sin poder automatizar las pruebas, también podría ser que no hayamos sido capaces de descubrir qué datos son los realmente importantes. 
+
+
+Nos gustaría indicar que se han hecho más pruebas pero no incluimos todas porque no todas son interesantes. Se ha intentado preprocesar los datos de varias maneras y usar métodos basados en bayes pero como decimos no se ha conseguido mejorar el resultado.
 
 
 La mejor prueba que hemos conseguido es la P4 con un valor F de 0.808:
