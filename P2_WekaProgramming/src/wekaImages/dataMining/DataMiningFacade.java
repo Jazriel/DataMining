@@ -134,7 +134,7 @@ public class DataMiningFacade {
 	public void saveClusterer() {
 
 		try {
-			weka.core.SerializationHelper.write("~/DataMining/P2_WekaProgramming/clusterer.model", clusterer);
+			weka.core.SerializationHelper.write("~\DataMining\P2_WekaProgramming\clusterer.model", clusterer);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -148,8 +148,10 @@ public class DataMiningFacade {
 
 		String header = "@RELATION " + dataset.relationName() + "\n";
 		for (int i = 0; i < dataset.numAttributes(); i++) {
-			header = "@ATTRIBUTE " + dataset.attribute(i).toString() + dataset.attribute(i).value(dataset.attribute(i).type()) + "\n"; // TODO add
-																	// value
+			header += "@ATTRIBUTE " + dataset.attribute(i).toString()
+					+ dataset.attribute(i).value(dataset.attribute(i).type()) + "\n"; // TODO
+																						// add
+			// value
 		}
 
 		File temp;
@@ -212,6 +214,17 @@ public class DataMiningFacade {
 	 *            boolean array with the image filters to apply
 	 */
 	public void buildDataset(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
+
+		String header = "@RELATION auto \n" + "@ATTRIBUTE imageid STRING\n";
+		// for (int i = 0; i < options.length; i++) {
+		// header += "@ATTRIBUTE filter"+i+" {true, false} \n";
+		// }
+		header += "@DATA\n";
+		for (String key : imagePathsMap.keySet()) {
+			for (String route : imagePathsMap.get(key)) {
+				header += route + "," + key + "\n";
+			}
+		}
 
 	}
 
