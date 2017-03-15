@@ -429,7 +429,10 @@ public class Mediator {
 		infoPanel.setText("Classify Image");
 		try {
 			boolean[] options = optionsPanel.getSelectedOptions();
-			facade.predictImage(imagePath,options);
+			String name = facade.predictImage(imagePath,options);
+			infoPanel.setText(name);
+			window.revalidate();
+			window.repaint();
 		} catch (MissingModelDataException e) {
 			infoPanel.setText("Dataset and/or model are missing");
 		}catch (IncompatibleAttributeException e) {

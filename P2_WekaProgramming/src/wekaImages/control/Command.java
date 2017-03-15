@@ -17,22 +17,30 @@ of the application.
  * @see java.awt.event.ActionListener
  * @see java.awt.event.ItemListener
  */
-public abstract class Command extends Thread implements ActionListener{
+public abstract class Command implements ActionListener{
 	/**
 	 * Run the command
 	 */
 	public abstract void runCommand();
+	
+	
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void actionPerformed(ActionEvent cmd){
-		this.start();
+		Executor ex = new Executor();
+		ex.start();
 	}
 	
-	@Override
-	public void run(){
-		runCommand();
+	
+	
+	private class Executor extends Thread {		
+		@Override
+		public void run(){
+			runCommand();
+		}
+		
 	}
 	
 }
