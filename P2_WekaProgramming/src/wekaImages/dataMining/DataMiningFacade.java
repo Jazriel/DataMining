@@ -44,6 +44,10 @@ public class DataMiningFacade {
 
 	private static DataMiningFacade facade;
 
+	private final Filter[] filters = { new AutoColorCorrelogramFilter(), new BinaryPatternsPyramidFilter(),
+			new ColorLayoutFilter(), new EdgeHistogramFilter(), new FCTHFilter(), new FuzzyOpponentHistogramFilter(),
+			new GaborFilter(), new JpegCoefficientFilter(), new PHOGFilter(), new SimpleColorHistogramFilter(), };
+
 	private Instances dataset;
 	private Classifier classifier;
 	private Clusterer clusterer;
@@ -195,7 +199,18 @@ public class DataMiningFacade {
 	 */
 	public void trainClassiffier(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 
-		//TODO empezar por aqui, mirar enunciado de practica, 
+		Instances inst = new Instances(loadDataset(path));
+		MultiFilter multiFilter = new MultiFilter();
+
+		Filter[] thisFilters = new Filter[options.length];
+		int j = 0;
+		for (int i = 0; i < 10; i++) {
+			if (options[i]) {
+				thisFilters[j] = filters[i];
+				j++;
+			}
+		}
+
 	}
 
 	/**
@@ -224,26 +239,50 @@ public class DataMiningFacade {
 	 */
 	public void buildDataset(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 
-		String header = "@RELATION auto \n" + "@ATTRIBUTE imageid STRING\n" + "@ATTRIBUTE class {";
+		String arff = "@RELATION auto \n" + "@ATTRIBUTE imageid STRING\n" + "@ATTRIBUTE class {";
 		for (String clss : imagePathsMap.keySet()) {
-			header += clss + ", ";
+			arff += clss + ", ";
 		}
-		header.substring(0, header.length() - 2);
-		header += "}";
-		header += "@DATA\n";
+		arff.substring(0, arff.length() - 2);
+		arff += "}";
+		arff += "@DATA\n";
 		for (String key : imagePathsMap.keySet()) {
 			for (String route : imagePathsMap.get(key)) {
-				header += route + ", " + key + "\n";
+				arff += route + ", " + key + "\n";
 			}
 		}
 
-		AbstractImageFilter abstractImageFilter = new MultiFilter();
-		for(int i = 0 ; i< 10; i++){
-			if ( options[i]){
-				//TODO multifiltrer aplicar filtros
-				
+		// TODO main 1 guardarlo en un fichero la cabecera y hacer tmpdata
+		// main 4 new data meter los filtros
+		File temp=;
+		try {
+			temp = File.createTempFile("temp", ".arff");
+
+			// añadir cabecera e instancias
+			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+
+			writer.write(arff);
+			writer.flush();
+			writer.close();
+			
+
+			loadDataset(temp.getCanonicalPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Filter[] thisFilters = new Filter[options.length];
+		int j = 0;
+		for (int i = 0; i < 10; i++) {
+			if (options[i]) {
+				thisFilters[j] = filters[i];
+				j++;
 			}
 		}
+		MultiFilter multiFilter = new MultiFilter();
+		multiFilter.setFilters(thisFilters);
+		MultiFilter.useFilter(, arg1);
 
 	}
 
