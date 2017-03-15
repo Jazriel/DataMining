@@ -17,9 +17,17 @@ import weka.filters.Filter;
 import weka.filters.MultiFilter;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.instance.imagefilter.AutoColorCorrelogramFilter;
+import weka.filters.unsupervised.instance.imagefilter.BinaryPatternsPyramidFilter;
+import weka.filters.unsupervised.instance.imagefilter.ColorLayoutFilter;
+import weka.filters.unsupervised.instance.imagefilter.EdgeHistogramFilter;
+import weka.filters.unsupervised.instance.imagefilter.FCTHFilter;
+import weka.filters.unsupervised.instance.imagefilter.FuzzyOpponentHistogramFilter;
+import weka.filters.unsupervised.instance.imagefilter.GaborFilter;
 import weka.filters.unsupervised.instance.imagefilter.JpegCoefficientFilter;
 import weka.filters.unsupervised.instance.imagefilter.PHOGFilter;
 import weka.filters.unsupervised.instance.imagefilter.SimpleColorHistogramFilter;
+import weka.filters.unsupervised.instance.imagefilter.AbstractImageFilter;
+import wekaImages.control.ImageFilter;
 import wekaImages.control.IncompatibleAttributeException;
 import wekaImages.control.MissingModelDataException;
 
@@ -187,6 +195,7 @@ public class DataMiningFacade {
 	 */
 	public void trainClassiffier(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 
+		//TODO empezar por aqui, mirar enunciado de practica, 
 	}
 
 	/**
@@ -215,14 +224,24 @@ public class DataMiningFacade {
 	 */
 	public void buildDataset(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 
-		String header = "@RELATION auto \n" + "@ATTRIBUTE imageid STRING\n";
-		// for (int i = 0; i < options.length; i++) {
-		// header += "@ATTRIBUTE filter"+i+" {true, false} \n";
-		// }
+		String header = "@RELATION auto \n" + "@ATTRIBUTE imageid STRING\n" + "@ATTRIBUTE class {";
+		for (String clss : imagePathsMap.keySet()) {
+			header += clss + ", ";
+		}
+		header.substring(0, header.length() - 2);
+		header += "}";
 		header += "@DATA\n";
 		for (String key : imagePathsMap.keySet()) {
 			for (String route : imagePathsMap.get(key)) {
-				header += route + "," + key + "\n";
+				header += route + ", " + key + "\n";
+			}
+		}
+
+		AbstractImageFilter abstractImageFilter = new MultiFilter();
+		for(int i = 0 ; i< 10; i++){
+			if ( options[i]){
+				//TODO multifiltrer aplicar filtros
+				
 			}
 		}
 
