@@ -282,7 +282,7 @@ public class DataMiningFacade {
 		}
 		MultiFilter multiFilter = new MultiFilter();
 		multiFilter.setFilters(thisFilters);
-		MultiFilter.useFilter(, arg1);
+		MultiFilter.useFilter(dataset, multiFilter);
 
 	}
 
