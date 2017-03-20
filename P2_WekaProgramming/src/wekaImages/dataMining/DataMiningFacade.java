@@ -48,9 +48,9 @@ public class DataMiningFacade {
 			new ColorLayoutFilter(), new EdgeHistogramFilter(), new FCTHFilter(), new FuzzyOpponentHistogramFilter(),
 			new GaborFilter(), new JpegCoefficientFilter(), new PHOGFilter(), new SimpleColorHistogramFilter(), };
 
-	private Instances dataset;
-	private Classifier classifier;
-	private Clusterer clusterer;
+	private Instances dataset = null;
+	private Classifier classifier = null;
+	private Clusterer clusterer = null;
 
 	/**
 	 * Obtain the static instance of DataMiningFacade PD Singleton
@@ -147,6 +147,7 @@ public class DataMiningFacade {
 
 		try {
 			weka.core.SerializationHelper.write("~\DataMining\P2_WekaProgramming\clusterer.model", clusterer);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -199,16 +200,15 @@ public class DataMiningFacade {
 	 */
 	public void trainClassiffier(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 
-		Instances inst = new Instances(loadDataset(path));
-		MultiFilter multiFilter = new MultiFilter();
+		buildDataset(imagePathsMap, options);
 
-		Filter[] thisFilters = new Filter[options.length];
-		int j = 0;
-		for (int i = 0; i < 10; i++) {
-			if (options[i]) {
-				thisFilters[j] = filters[i];
-				j++;
-			}
+		// TODO asumir clasificador cargado
+
+		try {
+			classifier.buildClassifier(dataset);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
@@ -224,6 +224,16 @@ public class DataMiningFacade {
 	 *            boolean array with the image filters to apply
 	 */
 	public void trainClusterer(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
+		buildDataset(imagePathsMap, options);
+
+		// TODO asumir clussterer cargado
+
+		try {
+			clusterer.buildClusterer(dataset);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -254,7 +264,10 @@ public class DataMiningFacade {
 
 		// TODO main 1 guardarlo en un fichero la cabecera y hacer tmpdata
 		// main 4 new data meter los filtros
-		File temp=;
+
+		// TODO preguntar si hay que filtrar directamente o hacer un filtered
+		// classifier.
+		File temp;
 		try {
 			temp = File.createTempFile("temp", ".arff");
 
@@ -264,25 +277,27 @@ public class DataMiningFacade {
 			writer.write(arff);
 			writer.flush();
 			writer.close();
-			
 
 			loadDataset(temp.getCanonicalPath());
+
+			Filter[] thisFilters = new Filter[options.length];
+			int j = 0;
+			for (int i = 0; i < 10; i++) {
+				if (options[i]) {
+					thisFilters[j] = filters[i];
+					j++;
+				}
+			}
+			MultiFilter multiFilter = new MultiFilter();
+			multiFilter.setFilters(thisFilters);
+			dataset = MultiFilter.useFilter(dataset, multiFilter);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		Filter[] thisFilters = new Filter[options.length];
-		int j = 0;
-		for (int i = 0; i < 10; i++) {
-			if (options[i]) {
-				thisFilters[j] = filters[i];
-				j++;
-			}
-		}
-		MultiFilter multiFilter = new MultiFilter();
-		multiFilter.setFilters(thisFilters);
-		MultiFilter.useFilter(dataset, multiFilter);
 
 	}
 
@@ -303,7 +318,21 @@ public class DataMiningFacade {
 	 */
 	public String predictImage(String imagePath, boolean[] options)
 			throws MissingModelDataException, IncompatibleAttributeException {
-		return "";
+		checkClassifier();
+		// TODO IncompatibleAttributeException
+
+		Instance instance;
+		try {
+			instance = new DataSource(imagePath).getDataSet().firstInstance();
+			double instanceClass = classifier.classifyInstance(instance);
+			// TODO traducir de numero a string
+			// TODO pregumtar options
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 
 	}
 
@@ -325,12 +354,15 @@ public class DataMiningFacade {
 	 */
 	public HashMap<String, ArrayList<String>> findSimilarities(String imagePath, boolean[] options)
 			throws MissingModelDataException, IncompatibleAttributeException {
+		checkClassifier();//checkClusterer();
+
 		return null;
+		// TODO q hace
 
 	}
 
 	/**
-	 * This method shows cluster assigments of the images contained in the
+	 * This method shows cluster assignments of the images contained in the
 	 * dataset
 	 * 
 	 * @return A hashmap with one key per cluster and the list of image paths
@@ -343,9 +375,49 @@ public class DataMiningFacade {
 	 */
 	public HashMap<String, ArrayList<String>> viewClusters()
 			throws MissingModelDataException, IncompatibleAttributeException {
+		checkClusterer();
+		// TODO suponemos clusterer entrenado
 
-		return null;
+		HashMap<String, ArrayList<String>> clustered = new HashMap<>();
 
+		for (int i = 0; i < dataset.numInstances(); i++) {
+			Instance instance = dataset.get(i);
+			int cluster;
+			try {
+				cluster = clusterer.clusterInstance(instance);
+				String key = String.valueOf(cluster);
+				ArrayList<String> clusterList = clustered.get(key);
+				String path = instance.attribute(0).toString();
+
+				if (clusterList != null) {
+					clusterList.add(path);
+				} else {
+					ArrayList<String> aux = new ArrayList<String>();
+					aux.add(path);
+					clustered.put(key, aux);
+				}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		return clustered;
+
+	}
+
+	private void checkClassifier() throws MissingModelDataException {
+		if (classifier == null) {
+			throw new MissingModelDataException();
+		}
+	}
+
+	private void checkClusterer() throws MissingModelDataException {
+		if (clusterer == null) {
+			throw new MissingModelDataException();
+		}
 	}
 
 }
