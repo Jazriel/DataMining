@@ -8,5 +8,4 @@ package wekaImages.control;
  *
  */
 public class IncompatibleAttributeException extends Exception {
-
 }

@@ -8,11 +8,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import weka.classifiers.Classifier;
+import weka.classifiers.trees.J48;
 import weka.clusterers.Clusterer;
 import weka.clusterers.SimpleKMeans;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.ManhattanDistance;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.core.neighboursearch.LinearNNSearch;
+import weka.core.neighboursearch.NearestNeighbourSearch;
 import weka.filters.Filter;
 import weka.filters.MultiFilter;
 import weka.filters.unsupervised.attribute.Remove;
@@ -87,8 +92,6 @@ public class DataMiningFacade {
 			source = new DataSource(path);
 			dataset = source.getDataSet();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 	}
@@ -104,8 +107,6 @@ public class DataMiningFacade {
 		try {
 			classifier = (Classifier) weka.core.SerializationHelper.read(path);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 	}
@@ -121,8 +122,6 @@ public class DataMiningFacade {
 		try {
 			clusterer = (Clusterer) weka.core.SerializationHelper.read(path);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 	}
@@ -133,10 +132,9 @@ public class DataMiningFacade {
 	public void saveClassifier() {
 
 		try {
-			weka.core.SerializationHelper.write("~/DataMining/P2_WekaProgramming/classifier.model", classifier);
+			weka.core.SerializationHelper.write(".\\models\\classifier.model", classifier);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		} // ruta
 	}
 
@@ -146,11 +144,9 @@ public class DataMiningFacade {
 	public void saveClusterer() {
 
 		try {
-			weka.core.SerializationHelper.write("~\DataMining\P2_WekaProgramming\clusterer.model", clusterer);
+			weka.core.SerializationHelper.write(".\\models\\clusterer.model", clusterer);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} // ruta
 	}
 
@@ -162,9 +158,7 @@ public class DataMiningFacade {
 		String header = "@RELATION " + dataset.relationName() + "\n";
 		for (int i = 0; i < dataset.numAttributes(); i++) {
 			header += "@ATTRIBUTE " + dataset.attribute(i).toString()
-					+ dataset.attribute(i).value(dataset.attribute(i).type()) + "\n"; // TODO
-																						// add
-			// value
+					+ dataset.attribute(i).value(dataset.attribute(i).type()) + "\n";
 		}
 
 		File temp;
@@ -183,8 +177,6 @@ public class DataMiningFacade {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
@@ -202,13 +194,12 @@ public class DataMiningFacade {
 
 		buildDataset(imagePathsMap, options);
 
-		// TODO asumir clasificador cargado
+		classifier = new J48();
 
 		try {
 			classifier.buildClassifier(dataset);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 
 	}
@@ -226,13 +217,10 @@ public class DataMiningFacade {
 	public void trainClusterer(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 		buildDataset(imagePathsMap, options);
 
-		// TODO asumir clussterer cargado
-
+		clusterer = new SimpleKMeans(); 
 		try {
 			clusterer.buildClusterer(dataset);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 	}
@@ -261,17 +249,18 @@ public class DataMiningFacade {
 				arff += route + ", " + key + "\n";
 			}
 		}
-
-		// TODO main 1 guardarlo en un fichero la cabecera y hacer tmpdata
-		// main 4 new data meter los filtros
-
-		// TODO preguntar si hay que filtrar directamente o hacer un filtered
-		// classifier.
+		// TODO 
+		// TODO 
+		// TODO Pillar fotos
+		// TODO 
+		// TODO 
+		
+		// filtrar directamente.
 		File temp;
 		try {
 			temp = File.createTempFile("temp", ".arff");
 
-			// aÃ±adir cabecera e instancias
+			// añadir cabecera e instancias
 			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
 
 			writer.write(arff);
@@ -280,27 +269,27 @@ public class DataMiningFacade {
 
 			loadDataset(temp.getCanonicalPath());
 
-			Filter[] thisFilters = new Filter[options.length];
-			int j = 0;
-			for (int i = 0; i < 10; i++) {
-				if (options[i]) {
-					thisFilters[j] = filters[i];
-					j++;
-				}
-			}
-			MultiFilter multiFilter = new MultiFilter();
-			multiFilter.setFilters(thisFilters);
-			dataset = MultiFilter.useFilter(dataset, multiFilter);
+			filter_dataset(dataset, options);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 	}
 
+	private Instances filter_dataset(Instances dataset, boolean[] options) throws Exception {
+		Filter[] thisFilters = new Filter[options.length];
+		int j = 0;
+		for (int i = 0; i < 10; i++) {
+			if (options[i]) {
+				thisFilters[j] = filters[i];
+				j++;
+			}
+		}
+		MultiFilter multiFilter = new MultiFilter();
+		multiFilter.setFilters(thisFilters);
+		return MultiFilter.useFilter(dataset, multiFilter);
+	}
+	
 	/**
 	 * This method predicts the class of an image, using the features indicated
 	 * in options and the classifier already built
@@ -318,9 +307,9 @@ public class DataMiningFacade {
 	 */
 	public String predictImage(String imagePath, boolean[] options)
 			throws MissingModelDataException, IncompatibleAttributeException {
+		
 		checkClassifier();
-		// TODO IncompatibleAttributeException
-
+		
 		Instance instance;
 		try {
 			instance = new DataSource(imagePath).getDataSet().firstInstance();
@@ -329,8 +318,7 @@ public class DataMiningFacade {
 			// TODO pregumtar options
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IncompatibleAttributeException();
 		}
 		return null;
 
@@ -354,11 +342,20 @@ public class DataMiningFacade {
 	 */
 	public HashMap<String, ArrayList<String>> findSimilarities(String imagePath, boolean[] options)
 			throws MissingModelDataException, IncompatibleAttributeException {
-		checkClassifier();//checkClusterer();
+		
+		NearestNeighbourSearch nnSearch = new LinearNNSearch();
 
+		nnSearch.setDistanceFunction(new ManhattanDistance());
+		nnSearch.setInstances(dataset);
+		Instance instance = new DenseInstance();
+		
+		
+		Instance instance = filter_dataset( , options)
+		//Obtiene los 5 vecinos más cercanos
+		Instances neighbours = nnSearch.kNearestNeighbours(instance, 5);
+		
 		return null;
-		// TODO q hace
-
+		
 	}
 
 	/**
@@ -376,7 +373,7 @@ public class DataMiningFacade {
 	public HashMap<String, ArrayList<String>> viewClusters()
 			throws MissingModelDataException, IncompatibleAttributeException {
 		checkClusterer();
-		// TODO suponemos clusterer entrenado
+
 
 		HashMap<String, ArrayList<String>> clustered = new HashMap<>();
 
@@ -398,8 +395,6 @@ public class DataMiningFacade {
 				}
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 
 		}
