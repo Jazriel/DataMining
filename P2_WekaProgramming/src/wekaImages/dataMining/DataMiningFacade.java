@@ -49,7 +49,7 @@ public class DataMiningFacade {
 
 	private static DataMiningFacade facade;
 
-	private final Filter[] filters = { new AutoColorCorrelogramFilter(), new BinaryPatternsPyramidFilter(),
+	private final AbstractImageFilter[] filters = { new AutoColorCorrelogramFilter(), new BinaryPatternsPyramidFilter(),
 			new ColorLayoutFilter(), new EdgeHistogramFilter(), new FCTHFilter(), new FuzzyOpponentHistogramFilter(),
 			new GaborFilter(), new JpegCoefficientFilter(), new PHOGFilter(), new SimpleColorHistogramFilter(), };
 
@@ -145,7 +145,7 @@ public class DataMiningFacade {
 
 		try {
 			weka.core.SerializationHelper.write(".\\models\\clusterer.model", clusterer);
-			
+
 		} catch (Exception e) {
 		} // ruta
 	}
@@ -155,28 +155,16 @@ public class DataMiningFacade {
 	 */
 	public void saveDataset() {
 
-		String header = "@RELATION " + dataset.relationName() + "\n";
-		for (int i = 0; i < dataset.numAttributes(); i++) {
-			header += "@ATTRIBUTE " + dataset.attribute(i).toString()
-					+ dataset.attribute(i).value(dataset.attribute(i).type()) + "\n";
-		}
-
-		File temp;
+		
 		try {
-			temp = File.createTempFile("dataset", ".arff");
+			File file = new File(".\\models\\dataset.arff");
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
-			// añadir cabecera e instancias
-			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
-
-			writer.write(header.toString());
-
-			for (Instance instance : dataset) {
-				writer.write(instance.toString());
-			}
-
+			writer.write(dataset.toString());
 			writer.flush();
 			writer.close();
-		} catch (IOException e) {
+			
+		} catch (Exception e) {
 		}
 	}
 
@@ -217,7 +205,7 @@ public class DataMiningFacade {
 	public void trainClusterer(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 		buildDataset(imagePathsMap, options);
 
-		clusterer = new SimpleKMeans(); 
+		clusterer = new SimpleKMeans();
 		try {
 			clusterer.buildClusterer(dataset);
 		} catch (Exception e) {
@@ -241,25 +229,20 @@ public class DataMiningFacade {
 		for (String clss : imagePathsMap.keySet()) {
 			arff += clss + ", ";
 		}
-		arff.substring(0, arff.length() - 2);
-		arff += "}";
+		arff = arff.substring(0, arff.length() - 2);
+		arff += "}\n";
 		arff += "@DATA\n";
 		for (String key : imagePathsMap.keySet()) {
 			for (String route : imagePathsMap.get(key)) {
 				arff += route + ", " + key + "\n";
 			}
 		}
-		// TODO 
-		// TODO 
-		// TODO Pillar fotos
-		// TODO 
-		// TODO 
-		
+
 		// filtrar directamente.
 		File temp;
 		try {
 			temp = File.createTempFile("temp", ".arff");
-
+			temp.deleteOnExit();
 			// añadir cabecera e instancias
 			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
 
@@ -269,27 +252,67 @@ public class DataMiningFacade {
 
 			loadDataset(temp.getCanonicalPath());
 
-			filter_dataset(dataset, options);
+			dataset = filter_dataset(dataset, options);
 		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
 
+	private Instances createInstance(String imagePath) {
+		String arff = "@RELATION auto \n" + 
+				"@ATTRIBUTE imageid STRING\n"+
+				"@ATTRIBUTE class {car, plane, train}\n";
+		// TODO atributos de clase dinamicos.
+		arff += "@DATA\n";
+
+		arff += imagePath + ", car\n";
+
+		// filtrar directamente.
+		File temp;
+		try {
+			temp = File.createTempFile("temp", ".arff");
+			temp.deleteOnExit();
+			// añadir cabecera e instancias
+			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+
+			writer.write(arff);
+			writer.flush();
+			writer.close();
+
+			DataSource source = new DataSource(temp.getCanonicalPath());
+			return source.getDataSet();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	private Instances filter_dataset(Instances dataset, boolean[] options) throws Exception {
-		Filter[] thisFilters = new Filter[options.length];
+		int len = 0;
+		for (boolean b : options) {
+			if(b){
+				len++;
+			}
+		}
+		AbstractImageFilter[] thisFilters = new AbstractImageFilter[len];
 		int j = 0;
 		for (int i = 0; i < 10; i++) {
 			if (options[i]) {
 				thisFilters[j] = filters[i];
+				thisFilters[j].setImageDirectory("");
 				j++;
 			}
 		}
 		MultiFilter multiFilter = new MultiFilter();
 		multiFilter.setFilters(thisFilters);
-		return MultiFilter.useFilter(dataset, multiFilter);
+		multiFilter.setInputFormat(dataset);
+		
+		return Filter.useFilter(dataset, multiFilter);
 	}
-	
+
 	/**
 	 * This method predicts the class of an image, using the features indicated
 	 * in options and the classifier already built
@@ -307,20 +330,17 @@ public class DataMiningFacade {
 	 */
 	public String predictImage(String imagePath, boolean[] options)
 			throws MissingModelDataException, IncompatibleAttributeException {
-		
+
 		checkClassifier();
 		
-		Instance instance;
 		try {
-			instance = new DataSource(imagePath).getDataSet().firstInstance();
+			Instance instance = filter_dataset(createInstance(imagePath), options).firstInstance();
+			
 			double instanceClass = classifier.classifyInstance(instance);
-			// TODO traducir de numero a string
-			// TODO pregumtar options
-
+			return dataset.classAttribute().value((int)instanceClass);
 		} catch (Exception e) {
 			throw new IncompatibleAttributeException();
 		}
-		return null;
 
 	}
 
@@ -342,20 +362,33 @@ public class DataMiningFacade {
 	 */
 	public HashMap<String, ArrayList<String>> findSimilarities(String imagePath, boolean[] options)
 			throws MissingModelDataException, IncompatibleAttributeException {
-		
-		NearestNeighbourSearch nnSearch = new LinearNNSearch();
 
-		nnSearch.setDistanceFunction(new ManhattanDistance());
-		nnSearch.setInstances(dataset);
-		Instance instance = new DenseInstance();
-		
-		
-		Instance instance = filter_dataset( , options)
-		//Obtiene los 5 vecinos más cercanos
-		Instances neighbours = nnSearch.kNearestNeighbours(instance, 5);
-		
-		return null;
-		
+		NearestNeighbourSearch nnSearch = new LinearNNSearch();
+		try {
+			nnSearch.setDistanceFunction(new ManhattanDistance());
+			nnSearch.setInstances(dataset);
+
+			Instance instance = filter_dataset(createInstance(imagePath), options).firstInstance();
+			// Obtiene los 5 vecinos más cercanos
+			Instances neighbours = nnSearch.kNearestNeighbours(instance, 5);
+
+			HashMap<String, ArrayList<String>> ret = new HashMap<>();
+			for (Instance i : neighbours) {
+				String key = i.classAttribute().toString();
+				String value = i.attribute(0).toString();
+				ArrayList<String> paths = ret.get(key);
+				if (paths != null) {
+					paths.add(value);
+				} else {
+					ArrayList<String> ar = new ArrayList<>();
+					ar.add(value);
+					ret.put(key, ar);
+				}
+			}
+			return ret;
+		} catch (Exception e) {
+			throw new IncompatibleAttributeException();
+		}
 	}
 
 	/**
@@ -373,7 +406,6 @@ public class DataMiningFacade {
 	public HashMap<String, ArrayList<String>> viewClusters()
 			throws MissingModelDataException, IncompatibleAttributeException {
 		checkClusterer();
-
 
 		HashMap<String, ArrayList<String>> clustered = new HashMap<>();
 
