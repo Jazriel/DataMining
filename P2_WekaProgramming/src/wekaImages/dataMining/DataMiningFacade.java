@@ -6,12 +6,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.trees.J48;
 import weka.clusterers.Clusterer;
 import weka.clusterers.SimpleKMeans;
-import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.ManhattanDistance;
@@ -21,6 +21,7 @@ import weka.core.neighboursearch.NearestNeighbourSearch;
 import weka.filters.Filter;
 import weka.filters.MultiFilter;
 import weka.filters.unsupervised.attribute.Remove;
+import weka.filters.unsupervised.instance.imagefilter.AbstractImageFilter;
 import weka.filters.unsupervised.instance.imagefilter.AutoColorCorrelogramFilter;
 import weka.filters.unsupervised.instance.imagefilter.BinaryPatternsPyramidFilter;
 import weka.filters.unsupervised.instance.imagefilter.ColorLayoutFilter;
@@ -31,8 +32,6 @@ import weka.filters.unsupervised.instance.imagefilter.GaborFilter;
 import weka.filters.unsupervised.instance.imagefilter.JpegCoefficientFilter;
 import weka.filters.unsupervised.instance.imagefilter.PHOGFilter;
 import weka.filters.unsupervised.instance.imagefilter.SimpleColorHistogramFilter;
-import weka.filters.unsupervised.instance.imagefilter.AbstractImageFilter;
-import wekaImages.control.ImageFilter;
 import wekaImages.control.IncompatibleAttributeException;
 import wekaImages.control.MissingModelDataException;
 
@@ -45,6 +44,22 @@ import wekaImages.control.MissingModelDataException;
  * @author JosÃ© Francisco DÃ­ez
  *
  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class DataMiningFacade {
 
 	private static DataMiningFacade facade;
@@ -56,6 +71,9 @@ public class DataMiningFacade {
 	private Instances dataset = null;
 	private Classifier classifier = null;
 	private Clusterer clusterer = null;
+
+	private Map<Instance, String> routes = new HashMap<>();
+	private Map<String, String> paths = new HashMap<>();
 
 	/**
 	 * Obtain the static instance of DataMiningFacade PD Singleton
@@ -92,6 +110,7 @@ public class DataMiningFacade {
 			source = new DataSource(path);
 			dataset = source.getDataSet();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -107,6 +126,7 @@ public class DataMiningFacade {
 		try {
 			classifier = (Classifier) weka.core.SerializationHelper.read(path);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -122,6 +142,7 @@ public class DataMiningFacade {
 		try {
 			clusterer = (Clusterer) weka.core.SerializationHelper.read(path);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -132,8 +153,9 @@ public class DataMiningFacade {
 	public void saveClassifier() {
 
 		try {
-			weka.core.SerializationHelper.write(".\\models\\classifier.model", classifier);
+			weka.core.SerializationHelper.write("./models/classifier.model", classifier);
 		} catch (Exception e) {
+			e.printStackTrace();
 
 		} // ruta
 	}
@@ -144,9 +166,10 @@ public class DataMiningFacade {
 	public void saveClusterer() {
 
 		try {
-			weka.core.SerializationHelper.write(".\\models\\clusterer.model", clusterer);
+			weka.core.SerializationHelper.write("./models/clusterer.model", clusterer);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 		} // ruta
 	}
 
@@ -157,7 +180,7 @@ public class DataMiningFacade {
 
 		
 		try {
-			File file = new File(".\\models\\dataset.arff");
+			File file = new File("./models/dataset.arff");
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
 			writer.write(dataset.toString());
@@ -165,6 +188,7 @@ public class DataMiningFacade {
 			writer.close();
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -187,7 +211,7 @@ public class DataMiningFacade {
 		try {
 			classifier.buildClassifier(dataset);
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 
 	}
@@ -204,11 +228,16 @@ public class DataMiningFacade {
 	 */
 	public void trainClusterer(HashMap<String, ArrayList<String>> imagePathsMap, boolean[] options) {
 		buildDataset(imagePathsMap, options);
-
+		
+		dataset.setClassIndex(-1); 
+		// dataset.deleteAttributeAt(dataset.numAttributes()-1); si lo borras falla
+		
+		
 		clusterer = new SimpleKMeans();
 		try {
 			clusterer.buildClusterer(dataset);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -243,7 +272,7 @@ public class DataMiningFacade {
 		try {
 			temp = File.createTempFile("temp", ".arff");
 			temp.deleteOnExit();
-			// añadir cabecera e instancias
+			// aï¿½adir cabecera e instancias
 			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
 
 			writer.write(arff);
@@ -252,7 +281,7 @@ public class DataMiningFacade {
 
 			loadDataset(temp.getCanonicalPath());
 
-			dataset = filter_dataset(dataset, options);
+			dataset = filterDataset(dataset, options);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -275,7 +304,7 @@ public class DataMiningFacade {
 		try {
 			temp = File.createTempFile("temp", ".arff");
 			temp.deleteOnExit();
-			// añadir cabecera e instancias
+			// aï¿½adir cabecera e instancias
 			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
 
 			writer.write(arff);
@@ -290,7 +319,7 @@ public class DataMiningFacade {
 		}
 	}
 
-	private Instances filter_dataset(Instances dataset, boolean[] options) throws Exception {
+	private Instances filterDataset(Instances dataset, boolean[] options) throws Exception {
 		int len = 0;
 		for (boolean b : options) {
 			if(b){
@@ -309,8 +338,20 @@ public class DataMiningFacade {
 		MultiFilter multiFilter = new MultiFilter();
 		multiFilter.setFilters(thisFilters);
 		multiFilter.setInputFormat(dataset);
+		Instances filteredDataset = Filter.useFilter(dataset, multiFilter);
 		
-		return Filter.useFilter(dataset, multiFilter);
+		for (Instance instance : filteredDataset) {
+			String aux = instance.stringValue(instance.attribute(0));
+			aux+="";
+			routes.put(instance, aux);
+		}
+		filteredDataset.deleteAttributeAt(0);
+		
+		for (Instance instance : filteredDataset) {
+			paths.put(instance.toString(), routes.get(instance));
+		}
+		filteredDataset.setClassIndex(filteredDataset.numAttributes()-1);
+		return filteredDataset;
 	}
 
 	/**
@@ -334,10 +375,11 @@ public class DataMiningFacade {
 		checkClassifier();
 		
 		try {
-			Instance instance = filter_dataset(createInstance(imagePath), options).firstInstance();
+			Instance instance = filterDataset(createInstance(imagePath), options).firstInstance();
 			
 			double instanceClass = classifier.classifyInstance(instance);
-			return dataset.classAttribute().value((int)instanceClass);
+			
+			return dataset.classAttribute().value((int)(instanceClass));
 		} catch (Exception e) {
 			throw new IncompatibleAttributeException();
 		}
@@ -368,22 +410,15 @@ public class DataMiningFacade {
 			nnSearch.setDistanceFunction(new ManhattanDistance());
 			nnSearch.setInstances(dataset);
 
-			Instance instance = filter_dataset(createInstance(imagePath), options).firstInstance();
-			// Obtiene los 5 vecinos más cercanos
+			Instance instance = filterDataset(createInstance(imagePath), options).firstInstance();
+			// Obtiene los 5 vecinos mï¿½s cercanos
 			Instances neighbours = nnSearch.kNearestNeighbours(instance, 5);
 
 			HashMap<String, ArrayList<String>> ret = new HashMap<>();
+			ArrayList<String> ar = new ArrayList<>();
+			ret.put(imagePath, ar);
 			for (Instance i : neighbours) {
-				String key = i.classAttribute().toString();
-				String value = i.attribute(0).toString();
-				ArrayList<String> paths = ret.get(key);
-				if (paths != null) {
-					paths.add(value);
-				} else {
-					ArrayList<String> ar = new ArrayList<>();
-					ar.add(value);
-					ret.put(key, ar);
-				}
+				ar.add(paths.get(i.toString()));
 			}
 			return ret;
 		} catch (Exception e) {
@@ -409,14 +444,13 @@ public class DataMiningFacade {
 
 		HashMap<String, ArrayList<String>> clustered = new HashMap<>();
 
-		for (int i = 0; i < dataset.numInstances(); i++) {
-			Instance instance = dataset.get(i);
+		for (Instance instance:dataset) {
 			int cluster;
 			try {
 				cluster = clusterer.clusterInstance(instance);
 				String key = String.valueOf(cluster);
 				ArrayList<String> clusterList = clustered.get(key);
-				String path = instance.attribute(0).toString();
+				String path = paths.get(instance.toString());
 
 				if (clusterList != null) {
 					clusterList.add(path);
@@ -427,6 +461,7 @@ public class DataMiningFacade {
 				}
 
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 		}
