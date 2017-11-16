@@ -1,0 +1,1 @@
+Para ejecutar necesitamos python 2, y las dependencias indicadas en el pdf.
